@@ -74,23 +74,30 @@ typedef enum
 {
     SECURITY_OPEN           = 0,                                                /**< Open security                           */
     SECURITY_WEP_PSK        = WEP_ENABLED,                                      /**< WEP Security with open authentication   */
-    SECURITY_WEP_SHARED     = ( WEP_ENABLED | SHARED_ENABLED ),                 /**< WEP Security with shared authentication */
-    SECURITY_WPA_TKIP_PSK   = ( WPA_SECURITY  | TKIP_ENABLED ),                 /**< WPA Security with TKIP                  */
-    SECURITY_WPA_AES_PSK    = ( WPA_SECURITY  | AES_ENABLED ),                  /**< WPA Security with AES                   */
-    SECURITY_WPA2_AES_PSK   = ( WPA2_SECURITY | AES_ENABLED ),                  /**< WPA2 Security with AES                  */
-    SECURITY_WPA2_TKIP_PSK  = ( WPA2_SECURITY | TKIP_ENABLED ),                 /**< WPA2 Security with TKIP                 */
-    SECURITY_WPA2_MIXED_PSK = ( WPA2_SECURITY | AES_ENABLED | TKIP_ENABLED ),   /**< WPA2 Security with AES & TKIP           */
+    SECURITY_WEP_SHARED     = (WEP_ENABLED | SHARED_ENABLED),                   /**< WEP Security with shared authentication */
+    SECURITY_WPA_TKIP_PSK   = (WPA_SECURITY  | TKIP_ENABLED),                   /**< WPA Security with TKIP                  */
+    SECURITY_WPA_AES_PSK    = (WPA_SECURITY  | AES_ENABLED),                    /**< WPA Security with AES                   */
+    SECURITY_WPA2_AES_PSK   = (WPA2_SECURITY | AES_ENABLED),                    /**< WPA2 Security with AES                  */
+    SECURITY_WPA2_TKIP_PSK  = (WPA2_SECURITY | TKIP_ENABLED),                   /**< WPA2 Security with TKIP                 */
+    SECURITY_WPA2_MIXED_PSK = (WPA2_SECURITY | AES_ENABLED | TKIP_ENABLED),     /**< WPA2 Security with AES & TKIP           */
     SECURITY_WPS_OPEN       = WPS_ENABLED,                                      /**< WPS with open security                  */
     SECURITY_WPS_SECURE     = (WPS_ENABLED | AES_ENABLED),                      /**< WPS with AES security                   */
-    SECURITY_UNKNOWN        = -1,                                               /**< May be returned by scan function if security is unknown. 
+    SECURITY_UNKNOWN        = -1,                                               /**< May be returned by scan function if security is unknown.
                                                                                      Do not pass this to the join function! */
 } rt_wlan_security_t;
 
 typedef enum
 {
+    WIFI_EVT_INIT_DONE = 0,
     WIFI_EVT_LINK_DOWN,
     WIFI_EVT_LINK_UP,
-}rt_wlan_event_t;
+    WIFI_EVT_STA_CONNECT,
+    WIFI_EVT_STA_DISCONNECT,
+    WIFI_EVT_AP_CONNECT,
+    WIFI_EVT_AP_DISCONNECT,
+    WIFI_EVT_SCAN_DONE,
+    WIFI_EVT_MAX,
+} rt_wlan_event_t;
 
 /* wifi network information */
 struct rt_wlan_info
@@ -118,58 +125,58 @@ struct rt_wlan_info_request
 };
 
 struct rt_wlan_device;
-typedef void (*rt_wlan_event_handler)(struct rt_wlan_device* device, rt_wlan_event_t event, void* user_data);
+typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data);
 
 struct rt_wlan_device
 {
     struct eth_device parent;
 
-    struct rt_wlan_info* info;
+    struct rt_wlan_info *info;
     char key[KEY_ARRAY_SIZE + 1];
 
-    rt_wlan_event_handler handler;
-    void* user_data;
+    rt_wlan_event_handler handler[WIFI_EVT_MAX];
+    void *user_data;
     int interface;
 };
 
 /*
  * Wi-Fi Information APIs
  */
-void rt_wlan_info_init(struct rt_wlan_info* info, rt_wlan_mode_t mode, rt_wlan_security_t security, 
-    char *ssid);
-void rt_wlan_info_deinit(struct rt_wlan_info* info);
+void rt_wlan_info_init(struct rt_wlan_info *info, rt_wlan_mode_t mode, rt_wlan_security_t security,
+                       char *ssid);
+void rt_wlan_info_deinit(struct rt_wlan_info *info);
 
 /*
  * Wi-Fi Manager APIs
  */
-int rt_wlan_init(struct rt_wlan_device* device, rt_wlan_mode_t mode);
+int rt_wlan_init(struct rt_wlan_device *device, rt_wlan_mode_t mode);
 
-int rt_wlan_connect(struct rt_wlan_device* device, struct rt_wlan_info* info, 
-    char *password);
-int rt_wlan_disconnect(struct rt_wlan_device* device);
+int rt_wlan_connect(struct rt_wlan_device *device, struct rt_wlan_info *info,
+                    char *password);
+int rt_wlan_disconnect(struct rt_wlan_device *device);
 
-int rt_wlan_softap(struct rt_wlan_device* device, struct rt_wlan_info* info, 
-    char *password);
+int rt_wlan_softap(struct rt_wlan_device *device, struct rt_wlan_info *info,
+                   char *password);
 
 /* set wifi information for AP */
-int rt_wlan_set_info(struct rt_wlan_device* device, struct rt_wlan_info* info);
+int rt_wlan_set_info(struct rt_wlan_device *device, struct rt_wlan_info *info);
 /* get wifi information for AP */
-struct rt_wlan_info *rt_wlan_get_info(struct rt_wlan_device* device);
+struct rt_wlan_info *rt_wlan_get_info(struct rt_wlan_device *device);
 
 /* get the AP result which were scaned in station */
-int rt_wlan_scan(struct rt_wlan_device* device, struct rt_wlan_info *infos, int item_sz);
+int rt_wlan_scan(struct rt_wlan_device *device, struct rt_wlan_info *infos, int item_sz);
 
 /* get rssi */
-int rt_wlan_get_rssi(struct rt_wlan_device* device);
+int rt_wlan_get_rssi(struct rt_wlan_device *device);
 /* Get/Set MAC */
-int rt_wlan_get_mac(struct rt_wlan_device* device,rt_uint8_t hwaddr[6]);
-int rt_wlan_set_mac(struct rt_wlan_device* device,rt_uint8_t hwaddr[6]);
+int rt_wlan_get_mac(struct rt_wlan_device *device, rt_uint8_t hwaddr[6]);
+int rt_wlan_set_mac(struct rt_wlan_device *device, rt_uint8_t hwaddr[6]);
 
 /* enter power save level */
-int rt_wlan_enter_powersave(struct rt_wlan_device* device, int level);
+int rt_wlan_enter_powersave(struct rt_wlan_device *device, int level);
 
-void rt_wlan_set_event_callback(struct rt_wlan_device* device, rt_wlan_event_handler handler, 
-    void *user_data);
+void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t event,
+                                rt_wlan_event_handler handler);
 
 #endif
 
