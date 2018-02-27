@@ -141,7 +141,7 @@ typedef struct
 } rt_wlan_scan_result_t;
 
 struct rt_wlan_device;
-typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data);
+typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, void *user_data);
 
 struct rt_wlan_device
 {
