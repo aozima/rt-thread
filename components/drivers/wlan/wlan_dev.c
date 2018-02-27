@@ -87,23 +87,9 @@ int rt_wlan_connect(struct rt_wlan_device *device, struct rt_wlan_info *info, ch
         rt_wlan_set_info(device, info);
     }
 
+    rt_strncpy((char *)device->key, (char *)password, sizeof(device->key) - 1);
+
     result = rt_device_control(RT_DEVICE(device), WIFI_EASYJOIN, (void *)password);
-    if (result == RT_EOK)
-    {
-        struct netif *netif = device->parent.netif;
-
-        netifapi_netif_set_up(netif);
-        eth_device_linkchange(&(device->parent), RT_TRUE);
-
-#ifdef RT_LWIP_DHCP
-        /* set DHCP flags */
-        // netif->flags |= NETIF_FLAG_DHCP;
-        /* start DHCP */
-        dhcp_start(netif);
-#endif
-
-        rt_strncpy((char *)device->key, (char *)password, sizeof(device->key) - 1);
-    }
 
     return result;
 }
@@ -119,16 +105,9 @@ int rt_wlan_softap(struct rt_wlan_device *device, struct rt_wlan_info *info, cha
         rt_wlan_set_info(device, info);
     }
 
+    rt_strncpy((char *)device->key, (char *)password, sizeof(device->key) - 1);
+
     result = rt_device_control(RT_DEVICE(device), WIFI_SOFTAP, (void *)password);
-    if (result == RT_EOK)
-    {
-        rt_strncpy((char *)device->key, (char *)password, sizeof(device->key) - 1);
-
-        netifapi_netif_set_up(device->parent.netif);
-        eth_device_linkchange(&(device->parent), RT_TRUE);
-
-        wifi_softap_setup_netif(device->parent.netif);
-    }
 
     return result;
 }
@@ -141,11 +120,6 @@ int rt_wlan_disconnect(struct rt_wlan_device *device)
 
     /* save event handler */
     result = rt_device_control(RT_DEVICE(device), WIFI_DISCONNECT, RT_NULL);
-    if (result == RT_EOK)
-    {
-        netifapi_netif_set_down(device->parent.netif);
-        eth_device_linkchange(&(device->parent), RT_FALSE);
-    }
 
     return result;
 }
