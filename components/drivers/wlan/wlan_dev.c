@@ -151,21 +151,13 @@ struct rt_wlan_info *rt_wlan_get_info(struct rt_wlan_device *device)
     return info;
 }
 
-int rt_wlan_scan(struct rt_wlan_device *device, struct rt_wlan_info *infos, int item_sz)
+int rt_wlan_scan(struct rt_wlan_device *device)
 {
     int result;
-    struct rt_wlan_info_request request;
 
-    if (device == RT_NULL) return 0;
+    result = rt_device_control(RT_DEVICE(device), WIFI_SCAN, RT_NULL);
 
-    request.req_number = item_sz;
-    request.rsp_number = 0;
-    request.infos = infos;
-
-    result = rt_device_control(RT_DEVICE(device), WIFI_SCAN, (void *)&request);
-    result = result; /* skip warning */
-
-    return request.rsp_number;
+    return result;
 }
 
 int rt_wlan_get_rssi(struct rt_wlan_device *device)

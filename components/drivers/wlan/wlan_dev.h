@@ -124,6 +124,22 @@ struct rt_wlan_info_request
     struct rt_wlan_info *infos;/* the array of information to save response */
 };
 
+typedef struct
+{
+    char ssid[32];
+    int16_t rssi;       /* signal strength */
+    char bssid[6];
+    uint32_t datarate;  /* maximal data rate */
+    uint16_t channel;   /* radio channel */
+    rt_wlan_security_t security;
+} ap_list_t;
+
+typedef struct
+{
+    char ap_num;
+    ap_list_t *ap_list;
+} rt_wlan_scan_result_t;
+
 struct rt_wlan_device;
 typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data);
 
@@ -164,7 +180,7 @@ int rt_wlan_set_info(struct rt_wlan_device *device, struct rt_wlan_info *info);
 struct rt_wlan_info *rt_wlan_get_info(struct rt_wlan_device *device);
 
 /* get the AP result which were scaned in station */
-int rt_wlan_scan(struct rt_wlan_device *device, struct rt_wlan_info *infos, int item_sz);
+int rt_wlan_scan(struct rt_wlan_device *device);
 
 /* get rssi */
 int rt_wlan_get_rssi(struct rt_wlan_device *device);
