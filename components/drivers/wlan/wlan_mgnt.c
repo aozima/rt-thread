@@ -81,13 +81,16 @@ static void wlan_mgnt_sta_disconnect_event(struct rt_wlan_device *device, void *
     WLAN_MGNT_DBG("wlan sta disconnect callback \n");
     netifapi_netif_set_down(device->parent.netif);
     netifapi_netif_set_link_down(device->parent.netif);
+#ifdef RT_LWIP_DHCP
+    dhcp_stop(device->parent.netif);
+#endif
 }
 
 static void wlan_mgnt_ap_connect_event(struct rt_wlan_device *device, void *user_data)
 {
     WLAN_MGNT_DBG("wlan ap connect callback \n");
     netifapi_netif_set_up(device->parent.netif);
-    netifapi_netif_set_link_down(device->parent.netif);
+    netifapi_netif_set_link_up(device->parent.netif);
 
     wifi_softap_setup_netif(device->parent.netif);
 }
@@ -97,7 +100,7 @@ static void wlan_mgnt_ap_disconnect_event(struct rt_wlan_device *device, void *u
     WLAN_MGNT_DBG("wlan ap disconnect callback \n");
 
     netifapi_netif_set_down(device->parent.netif);
-    eth_device_linkchange(&(device->parent), RT_FALSE);
+    netifapi_netif_set_link_down(device->parent.netif);
 }
 
 int rt_wlan_mgnt_attach(void)
