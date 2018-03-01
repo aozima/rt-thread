@@ -152,11 +152,11 @@ typedef struct
 typedef struct
 {
     int16_t rssi;
-} rt_wlan_link_info;
+} rt_wlan_link_info_t;
 
 struct rt_wlan_device;
 typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, void *user_data);
-typedef void (*rt_wlan_monitor_cb_t)(uint8_t *data, int len, rt_wlan_link_info *link_info);
+typedef void (*rt_wlan_monitor_cb_t)(uint8_t *data, int len, rt_wlan_link_info_t *link_info);
 struct rt_wlan_device
 {
     struct eth_device parent;
@@ -207,6 +207,8 @@ int rt_wlan_enter_powersave(struct rt_wlan_device *device, int level);
 
 void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t event,
                                 rt_wlan_event_handler handler);
+
+void rt_wlan_handle_event(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data);
 
 /* start or stop monitor */
 int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t opition);

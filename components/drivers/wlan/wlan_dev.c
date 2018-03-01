@@ -206,6 +206,14 @@ void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t e
     device->handler[event] = handler;
 }
 
+void rt_wlan_handle_event(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data)
+{
+    if (device == RT_NULL) return ;
+
+    if(device->handler[event] != RT_NULL)
+        device->handler[event](device, user_data);
+}
+
 int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t opition)
 {
     int result = 0;
@@ -223,7 +231,7 @@ int rt_wlan_register_monitor(struct rt_wlan_device *device, rt_wlan_monitor_cb_t
 
     if (device == RT_NULL) return -RT_EIO;
 
-    result = rt_device_control(RT_DEVICE(device), WIFI_SET_MONITOR_CALLBACK, (void *)&callback);
+    result = rt_device_control(RT_DEVICE(device), WIFI_SET_MONITOR_CALLBACK, (void *)callback);
 
     return result;
 }
