@@ -206,13 +206,13 @@ void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t e
     device->handler[event] = handler;
 }
 
-int rt_wlan_enter_monitor(struct rt_wlan_device *device, rt_wlan_monitor_t event)
+int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_t event)
 {
     int result = 0;
 
     if (device == RT_NULL) return -RT_EIO;
 
-    result = rt_device_control(RT_DEVICE(device), WIFI_ENTER_MONITOR, (void *)&event);
+    result = rt_device_control(RT_DEVICE(device), WIFI_CFG_MONITOR, (void *)&event);
 
     return result;
 }

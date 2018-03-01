@@ -47,7 +47,7 @@ typedef enum
     WIFI_DISCONNECT,
     WIFI_GET_RSSI,          /* get sensitivity (dBm) */
     WIFI_ENTER_POWERSAVE,
-    WIFI_ENTER_MONITOR,     /* start/stop minitor */
+    WIFI_CFG_MONITOR,       /* start/stop minitor */
     WIFI_SET_CHANNEL,
     WIFI_SET_MONITOR_CALLBACK,
 } rt_wlan_cmd_t;
@@ -209,7 +209,7 @@ void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t e
                                 rt_wlan_event_handler handler);
 
 /* start or stop monitor */
-int rt_wlan_enter_monitor(struct rt_wlan_device *device, rt_wlan_monitor_t event);
+int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_t event);
 
 /* register callback function for monitor mode*/
 int rt_wlan_register_monitor(struct rt_wlan_device *device, rt_wlan_monitor_cb_t callback);
