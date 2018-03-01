@@ -103,41 +103,17 @@ static void wlan_mgnt_ap_disconnect_event(struct rt_wlan_device *device, void *u
     netifapi_netif_set_link_down(device->parent.netif);
 }
 
-int rt_wlan_mgnt_attach(void)
+int rt_wlan_mgnt_attach(struct rt_wlan_device *device, void *user_data)
 {
-    struct rt_wlan_device *wlan;
+    RT_ASSERT(device != RT_NULL);
 
-#ifdef RT_USING_WLAN_STA
-    /* get sta wlan device */
-    wlan = (struct rt_wlan_device*)rt_device_find(WIFI_DEVICE_STA_NAME);
-    if (!wlan)
-    {
-        rt_kprintf("no wlan:%s device\n", WIFI_DEVICE_STA_NAME);
-        return -RT_ERROR;
-    }
-
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_INIT_DONE, wlan_mgnt_init_done_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_LINK_DOWN, wlan_mgnt_link_up_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_LINK_UP, wlan_mgnt_link_down_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_STA_CONNECT, wlan_mgnt_sta_connect_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_STA_DISCONNECT, wlan_mgnt_sta_disconnect_event);
-#endif
-
-#ifdef RT_USING_WLAN_AP
-    /* get ap wlan device */
-    wlan = (struct rt_wlan_device*)rt_device_find(WIFI_DEVICE_AP_NAME);
-    if (!wlan)
-    {
-        rt_kprintf("no wlan:%s device\n", WIFI_DEVICE_AP_NAME);
-        return -RT_ERROR;
-    }
-
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_INIT_DONE, wlan_mgnt_init_done_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_LINK_DOWN, wlan_mgnt_link_up_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_LINK_UP, wlan_mgnt_link_down_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_AP_CONNECT, wlan_mgnt_ap_connect_event);
-    rt_wlan_set_event_callback(wlan, WIFI_EVT_AP_DISCONNECT, wlan_mgnt_ap_disconnect_event);
-#endif
+    rt_wlan_set_event_callback(device, WIFI_EVT_INIT_DONE, wlan_mgnt_init_done_event);
+    rt_wlan_set_event_callback(device, WIFI_EVT_LINK_DOWN, wlan_mgnt_link_up_event);
+    rt_wlan_set_event_callback(device, WIFI_EVT_LINK_UP, wlan_mgnt_link_down_event);
+    rt_wlan_set_event_callback(device, WIFI_EVT_STA_CONNECT, wlan_mgnt_sta_connect_event);
+    rt_wlan_set_event_callback(device, WIFI_EVT_STA_DISCONNECT, wlan_mgnt_sta_disconnect_event);
+    rt_wlan_set_event_callback(device, WIFI_EVT_AP_CONNECT, wlan_mgnt_ap_connect_event);
+    rt_wlan_set_event_callback(device, WIFI_EVT_AP_DISCONNECT, wlan_mgnt_ap_disconnect_event);
 
     return RT_EOK;
 }

@@ -29,6 +29,6 @@
 #ifndef __WLAN_MGNT_H__
 #define __WLAN_MGNT_H__
 
-int rt_wlan_mgnt_attach(void);
+int rt_wlan_mgnt_attach(struct rt_wlan_device *device, void *user_data);
 
 #endif
