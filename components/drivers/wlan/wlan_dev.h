@@ -63,7 +63,7 @@ typedef enum
 {
     WIFI_MONITOR_START,
     WIFI_MONITOR_STOP
-} rt_wlan_monitor_t;
+} rt_wlan_monitor_opition_t;
 
 #define SHARED_ENABLED  0x00008000
 #define WPA_SECURITY    0x00200000
@@ -209,7 +209,7 @@ void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t e
                                 rt_wlan_event_handler handler);
 
 /* start or stop monitor */
-int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_t event);
+int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t opition);
 
 /* register callback function for monitor mode*/
 int rt_wlan_register_monitor(struct rt_wlan_device *device, rt_wlan_monitor_cb_t callback);
