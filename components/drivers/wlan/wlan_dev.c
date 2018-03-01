@@ -29,8 +29,6 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 
-#include <lwip/netifapi.h>
-
 #include "wlan_dev.h"
 #include "wlan_cmd.h"
 
@@ -206,4 +204,37 @@ void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t e
     if (device == RT_NULL) return ;
 
     device->handler[event] = handler;
+}
+
+int rt_wlan_enter_monitor(struct rt_wlan_device *device, rt_wlan_monitor_t event)
+{
+    int result = 0;
+
+    if (device == RT_NULL) return -RT_EIO;
+
+    result = rt_device_control(RT_DEVICE(device), WIFI_ENTER_MONITOR, (void *)&event);
+
+    return result;
+}
+
+int rt_wlan_register_monitor(struct rt_wlan_device *device, rt_wlan_monitor_cb_t callback)
+{
+    int result = 0;
+
+    if (device == RT_NULL) return -RT_EIO;
+
+    result = rt_device_control(RT_DEVICE(device), WIFI_SET_MONITOR_CALLBACK, (void *)&callback);
+
+    return result;
+}
+
+int rt_wlan_set_channel(struct rt_wlan_device *device, int channel)
+{
+    int result = 0;
+
+    if (device == RT_NULL) return -RT_EIO;
+
+    result = rt_device_control(RT_DEVICE(device), WIFI_SET_CHANNEL, (void *)&channel);
+
+    return result;
 }
