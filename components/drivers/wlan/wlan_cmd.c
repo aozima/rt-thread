@@ -40,6 +40,14 @@ static char wifi_ssid[32]    = {0};
 static char wifi_key[32]     = {0};
 static int network_mode      = WIFI_STATION;
 
+#define WLAN_DEBUG   1
+#if WLAN_DEBUG
+#define WLAN_DBG(...)     rt_kprintf("[WLAN]"),rt_kprintf(__VA_ARGS__)
+#else
+#define WLAN_DBG(...)
+#endif
+
+
 #ifndef WIFI_SETTING_FN
 #define WIFI_SETTING_FN     "/appfs/setting.json"
 #endif
@@ -50,6 +58,10 @@ static int network_mode      = WIFI_STATION;
 #ifndef WIFI_DEVICE_AP_NAME
 #define WIFI_DEVICE_AP_NAME    "ap"
 #endif
+
+static char wifi_ssid[32]    = {0};
+static char wifi_key[32]     = {0};
+static int network_mode      = WIFI_STATION;
 
 #ifdef RT_USING_DFS
 #include <dfs_posix.h>
@@ -443,7 +455,7 @@ int wifi(int argc, char** argv)
             int index, num;
 
             memset(infos, 0x0, sizeof(struct rt_wlan_info) * 12);
-            num = rt_wlan_scan(wlan, infos, 12);
+            // num = rt_wlan_scan(wlan, infos, 12);
 
             for (index = 0; index < num; index ++)
             {
