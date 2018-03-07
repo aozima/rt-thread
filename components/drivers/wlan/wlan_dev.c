@@ -128,8 +128,8 @@ int rt_wlan_set_info(struct rt_wlan_device *device, struct rt_wlan_info *info)
 
     if (device->info != RT_NULL)
     {
-        rt_wlan_info_deinit(device->info);
-        rt_free(device->info);
+        // rt_wlan_info_deinit(device->info);
+        // rt_free(device->info);
     }
 
     device->info = info;
