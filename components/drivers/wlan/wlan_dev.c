@@ -198,20 +198,36 @@ int rt_wlan_enter_powersave(struct rt_wlan_device *device, int level)
     return result;
 }
 
-void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t event,
-                                rt_wlan_event_handler handler)
+int rt_wlan_register_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event,
+                                    rt_wlan_event_handler handler)
 {
-    if (device == RT_NULL) return ;
+    if (device == RT_NULL) return -RT_EIO;
+    if (event >= WIFI_EVT_MAX) return -RT_EINVAL;
 
     device->handler[event] = handler;
+
+    return RT_EOK;
 }
 
-void rt_wlan_handle_event(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data)
+int rt_wlan_unregister_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event)
 {
-    if (device == RT_NULL) return ;
+    if (device == RT_NULL) return -RT_EIO;
+    if (event >= WIFI_EVT_MAX) return -RT_EINVAL;
+
+    device->handler[event] = RT_NULL;
+
+    return RT_EOK;
+}
+
+int rt_wlan_indicate_event_handle(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data)
+{
+    if (device == RT_NULL) return -RT_EIO;
+    if (event >= WIFI_EVT_MAX) return -RT_EINVAL;
 
     if(device->handler[event] != RT_NULL)
-        device->handler[event](device, user_data);
+        device->handler[event](device, event, user_data);
+    
+    return RT_EOK;
 }
 
 int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t opition)
@@ -225,7 +241,7 @@ int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t
     return result;
 }
 
-int rt_wlan_register_monitor(struct rt_wlan_device *device, rt_wlan_monitor_cb_t callback)
+int rt_wlan_set_monitor_callback(struct rt_wlan_device *device, rt_wlan_monitor_callback_t callback)
 {
     int result = 0;
 

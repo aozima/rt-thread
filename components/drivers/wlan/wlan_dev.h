@@ -100,10 +100,12 @@ typedef enum
     WIFI_EVT_INIT_DONE = 0,
     WIFI_EVT_LINK_DOWN,
     WIFI_EVT_LINK_UP,
-    WIFI_EVT_STA_CONNECT,
-    WIFI_EVT_STA_DISCONNECT,
-    WIFI_EVT_AP_CONNECT,
-    WIFI_EVT_AP_DISCONNECT,
+    WIFI_EVT_CONNECT,
+    WIFI_EVT_DISCONNECT,
+    WIFI_EVT_AP_START,
+    WIFI_EVT_AP_STOP,
+    WIFI_EVENT_STA_ASSOC,
+    WIFI_EVENT_STA_DISASSOC,
     WIFI_EVT_SCAN_DONE,
     WIFI_EVT_MAX,
 } rt_wlan_event_t;
@@ -149,14 +151,9 @@ typedef struct
     ap_list_t *ap_list;
 } rt_wlan_scan_result_t;
 
-typedef struct
-{
-    int16_t rssi;
-} rt_wlan_link_info_t;
-
 struct rt_wlan_device;
-typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, void *user_data);
-typedef void (*rt_wlan_monitor_cb_t)(uint8_t *data, int len, rt_wlan_link_info_t *link_info);
+typedef void (*rt_wlan_event_handler)(struct rt_wlan_device* device, rt_wlan_event_t event, void* user_data);
+typedef void (*rt_wlan_monitor_callback_t)(uint8_t *data, int len, void *user_data);
 struct rt_wlan_device
 {
     struct eth_device parent;
@@ -205,16 +202,22 @@ int rt_wlan_set_mac(struct rt_wlan_device *device, rt_uint8_t hwaddr[6]);
 /* enter power save level */
 int rt_wlan_enter_powersave(struct rt_wlan_device *device, int level);
 
-void rt_wlan_set_event_callback(struct rt_wlan_device *device, rt_wlan_event_t event,
-                                rt_wlan_event_handler handler);
+/* register the event handler */
+int rt_wlan_register_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event,
+                                    rt_wlan_event_handler handler);
 
-void rt_wlan_handle_event(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data);
+/* un-register the event handler */
+int rt_wlan_unregister_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event);
+
+/* wlan driver indicate event to upper layer through wifi_indication. */
+int rt_wlan_indicate_event_handle(struct rt_wlan_device *device, rt_wlan_event_t event,
+                                    void *user_data);
 
 /* start or stop monitor */
 int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t opition);
 
-/* register callback function for monitor mode*/
-int rt_wlan_register_monitor(struct rt_wlan_device *device, rt_wlan_monitor_cb_t callback);
+/* set callback function for monitor mode*/
+int rt_wlan_set_monitor_callback(struct rt_wlan_device *device, rt_wlan_monitor_callback_t callback);
 
 /* Set the monitor channel */
 int rt_wlan_set_channel(struct rt_wlan_device *device, int channel);
