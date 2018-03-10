@@ -135,24 +135,14 @@ struct rt_wlan_info_request
     struct rt_wlan_info *infos;/* the array of information to save response */
 };
 
-typedef struct
-{
-    char ssid[32];
-    int16_t rssi;       /* signal strength */
-    char bssid[6];
-    uint32_t datarate;  /* maximal data rate */
-    uint16_t channel;   /* radio channel */
-    rt_wlan_security_t security;
-} ap_list_t;
-
-typedef struct
+typedef struct rt_wlan_scan_result
 {
     char ap_num;
-    ap_list_t *ap_list;
+    struct rt_wlan_info *ap_table;
 } rt_wlan_scan_result_t;
 
 struct rt_wlan_device;
-typedef void (*rt_wlan_event_handler)(struct rt_wlan_device* device, rt_wlan_event_t event, void* user_data);
+typedef void (*rt_wlan_event_handler)(struct rt_wlan_device *device, rt_wlan_event_t event, void *user_data);
 typedef void (*rt_wlan_monitor_callback_t)(uint8_t *data, int len, void *user_data);
 struct rt_wlan_device
 {
@@ -191,7 +181,7 @@ int rt_wlan_set_info(struct rt_wlan_device *device, struct rt_wlan_info *info);
 struct rt_wlan_info *rt_wlan_get_info(struct rt_wlan_device *device);
 
 /* get the AP result which were scaned in station */
-int rt_wlan_scan(struct rt_wlan_device *device);
+int rt_wlan_scan(struct rt_wlan_device *device, struct rt_wlan_scan_result **scan_result);
 
 /* get rssi */
 int rt_wlan_get_rssi(struct rt_wlan_device *device);
@@ -204,14 +194,14 @@ int rt_wlan_enter_powersave(struct rt_wlan_device *device, int level);
 
 /* register the event handler */
 int rt_wlan_register_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event,
-                                    rt_wlan_event_handler handler);
+                                   rt_wlan_event_handler handler);
 
 /* un-register the event handler */
 int rt_wlan_unregister_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event);
 
 /* wlan driver indicate event to upper layer through wifi_indication. */
 int rt_wlan_indicate_event_handle(struct rt_wlan_device *device, rt_wlan_event_t event,
-                                    void *user_data);
+                                  void *user_data);
 
 /* start or stop monitor */
 int rt_wlan_cfg_monitor(struct rt_wlan_device *device, rt_wlan_monitor_opition_t opition);
@@ -221,6 +211,8 @@ int rt_wlan_set_monitor_callback(struct rt_wlan_device *device, rt_wlan_monitor_
 
 /* Set the monitor channel */
 int rt_wlan_set_channel(struct rt_wlan_device *device, int channel);
+
+void rt_wlan_release_scan_result(struct rt_wlan_scan_result **scan_result);
 
 #endif
 

@@ -76,7 +76,7 @@ int wifi_set_mode(int mode)
     return network_mode;
 }
 
-int wifi_set_setting(const char* ssid, const char* pwd)
+int wifi_set_setting(const char *ssid, const char *pwd)
 {
     if (!ssid) return -1;
 
@@ -94,13 +94,13 @@ int wifi_set_setting(const char* ssid, const char* pwd)
 }
 
 #ifdef PKG_USING_CJSON
-int wifi_read_cfg(const char* filename)
+int wifi_read_cfg(const char *filename)
 {
     int fd;
     cJSON *json = RT_NULL;
 
-    fd = open(filename,O_RDONLY, 0);
-    if(fd < 0)
+    fd = open(filename, O_RDONLY, 0);
+    if (fd < 0)
     {
         /* no setting file */
         return -1;
@@ -113,7 +113,7 @@ int wifi_read_cfg(const char* filename)
         length = lseek(fd, 0, SEEK_END);
         if (length)
         {
-            char *json_str = (char *) rt_malloc (length);
+            char *json_str = (char *) rt_malloc(length);
             if (json_str)
             {
                 lseek(fd, 0, SEEK_SET);
@@ -156,7 +156,7 @@ int wifi_read_cfg(const char* filename)
     return 0;
 }
 
-int wifi_save_cfg(const char* filename)
+int wifi_save_cfg(const char *filename)
 {
     int fd;
     cJSON *json = RT_NULL;
@@ -169,7 +169,7 @@ int wifi_save_cfg(const char* filename)
         length = lseek(fd, 0, SEEK_END);
         if (length)
         {
-            char *json_str = (char *) rt_malloc (length);
+            char *json_str = (char *) rt_malloc(length);
             if (json_str)
             {
                 lseek(fd, 0, SEEK_SET);
@@ -251,9 +251,9 @@ int wifi_save_cfg(const char* filename)
 
 int wifi_save_setting(void)
 {
-    #ifdef PKG_USING_CJSON
+#ifdef PKG_USING_CJSON
     wifi_save_cfg(WIFI_SETTING_FN);
-    #endif
+#endif
 
     return 0;
 }
@@ -281,13 +281,13 @@ int wifi_softap_setup_netif(struct netif *netif)
         }
 
         /* set gateway address */
-        if ( ipaddr_aton("192.168.169.1", &addr))
+        if (ipaddr_aton("192.168.169.1", &addr))
         {
             netif_set_gw(netif, ip);
         }
 
         /* set netmask address */
-        if ( ipaddr_aton("255.255.255.0", &addr))
+        if (ipaddr_aton("255.255.255.0", &addr))
         {
             netif_set_netmask(netif, ip);
         }
@@ -298,7 +298,7 @@ int wifi_softap_setup_netif(struct netif *netif)
         {
             char name[8];
             memset(name, 0, sizeof(name));
-            strncpy(name, netif->name, sizeof(name)>sizeof(netif->name)? sizeof(netif->name) : sizeof(name));
+            strncpy(name, netif->name, sizeof(name) > sizeof(netif->name) ? sizeof(netif->name) : sizeof(name));
             dhcpd_start(name);
         }
 #endif
@@ -312,15 +312,15 @@ int wifi_default(void)
     int result = 0;
     struct rt_wlan_device *wlan;
 
-    #ifdef PKG_USING_CJSON
+#ifdef PKG_USING_CJSON
     /* read default setting for wifi */
     wifi_read_cfg(WIFI_SETTING_FN);
-    #endif
+#endif
 
     if (network_mode == WIFI_STATION)
     {
         /* get wlan device */
-        wlan = (struct rt_wlan_device*)rt_device_find(WIFI_DEVICE_STA_NAME);
+        wlan = (struct rt_wlan_device *)rt_device_find(WIFI_DEVICE_STA_NAME);
         if (!wlan)
         {
             rt_kprintf("no wlan:%s device\n", WIFI_DEVICE_STA_NAME);
@@ -329,7 +329,7 @@ int wifi_default(void)
 
         /* wifi station */
         rt_wlan_info_init(&info, WIFI_STATION, SECURITY_WPA2_MIXED_PSK, wifi_ssid);
-        result =rt_wlan_init(wlan, WIFI_STATION);
+        result = rt_wlan_init(wlan, WIFI_STATION);
         if (result == RT_EOK)
         {
             result = rt_wlan_connect(wlan, &info, wifi_key);
@@ -339,7 +339,7 @@ int wifi_default(void)
     {
         /* wifi AP */
         /* get wlan device */
-        wlan = (struct rt_wlan_device*)rt_device_find(WIFI_DEVICE_AP_NAME);
+        wlan = (struct rt_wlan_device *)rt_device_find(WIFI_DEVICE_AP_NAME);
         if (!wlan)
         {
             rt_kprintf("no wlan:%s device\n", WIFI_DEVICE_AP_NAME);
@@ -350,7 +350,7 @@ int wifi_default(void)
         info.channel = 11;
 
         /* wifi soft-AP */
-        result =rt_wlan_init(wlan, WIFI_AP);
+        result = rt_wlan_init(wlan, WIFI_AP);
         if (result == RT_EOK)
         {
             result = rt_wlan_softap(wlan, &info, wifi_key);
@@ -367,14 +367,14 @@ static void wifi_usage(void)
     rt_kprintf("wifi          - Do the default wifi action\n");
     rt_kprintf("wifi wlan_dev scan\n");
     rt_kprintf("wifi wlan_dev join SSID PASSWORD\n");
-    rt_kprintf("wifi wlan_dev ap SSID [PASSWORD]\n");    
+    rt_kprintf("wifi wlan_dev ap SSID [PASSWORD]\n");
     rt_kprintf("wifi wlan_dev up\n");
     rt_kprintf("wifi wlan_dev down\n");
     rt_kprintf("wifi wlan_dev rssi\n");
     rt_kprintf("wifi wlan_dev status\n");
 }
 
-int wifi(int argc, char** argv)
+int wifi(int argc, char **argv)
 {
     struct rt_wlan_device *wlan;
 
@@ -401,15 +401,15 @@ int wifi(int argc, char** argv)
 
         network_mode = WIFI_STATION;
 
-        #ifdef PKG_USING_CJSON
+#ifdef PKG_USING_CJSON
         wifi_save_cfg(WIFI_SETTING_FN);
-        #endif
+#endif
 
         return 0;
     }
 
     /* get wlan device */
-    wlan = (struct rt_wlan_device*)rt_device_find(argv[1]);
+    wlan = (struct rt_wlan_device *)rt_device_find(argv[1]);
     if (!wlan)
     {
         rt_kprintf("no wlan:%s device\n", argv[1]);
@@ -442,33 +442,24 @@ int wifi(int argc, char** argv)
     }
     else if (strcmp(argv[2], "scan") == 0)
     {
-        struct rt_wlan_info *infos;
+        struct rt_wlan_scan_result *scan_result = RT_NULL;
 
-        infos = (struct rt_wlan_info*)rt_malloc(sizeof(struct rt_wlan_info) * 12);
-        if (infos)
+        rt_wlan_scan(wlan, &scan_result);
+        if (scan_result)
         {
             int index, num;
 
-            memset(infos, 0x0, sizeof(struct rt_wlan_info) * 12);
-            // num = rt_wlan_scan(wlan, infos, 12);
-
+            num = scan_result->ap_num;
+            rt_kprintf("----Wi-Fi APInformation----\n");
             for (index = 0; index < num; index ++)
             {
-                rt_kprintf("----Wi-Fi AP[%d] Information----\n", index);
-                rt_kprintf("SSID: %-.32s\n", infos[index].ssid);
-                rt_kprintf("rssi: %d\n", infos[index].rssi);
-                rt_kprintf(" chn: %d\n", infos[index].channel);
-                rt_kprintf("rate: %d\n", infos[index].datarate);
-                rt_kprintf("\n");
+                rt_kprintf("SSID:%-.32s, ", scan_result->ap_table[index].ssid);
+                rt_kprintf("rssi:%d, ", scan_result->ap_table[index].rssi);
+                rt_kprintf("chn:%d, ", scan_result->ap_table[index].channel);
+                rt_kprintf("rate:%d\n", scan_result->ap_table[index].datarate);
             }
-
-            /* de-initialize info */
-            for (index = 0; index < num; index ++)
-            {
-                rt_wlan_info_deinit(&infos[index]);
-            }
-            rt_free(infos);
         }
+        rt_wlan_release_scan_result(&scan_result);
     }
     else if (strcmp(argv[2], "rssi") == 0)
     {
@@ -487,7 +478,7 @@ int wifi(int argc, char** argv)
             rt_wlan_info_init(&info, WIFI_AP, SECURITY_OPEN, argv[3]);
             info.channel = 11;
 
-            result =rt_wlan_init(wlan, WIFI_AP);
+            result = rt_wlan_init(wlan, WIFI_AP);
             /* start soft ap */
             result = rt_wlan_softap(wlan, &info, NULL);
             if (result == RT_EOK)
@@ -501,19 +492,19 @@ int wifi(int argc, char** argv)
             rt_wlan_info_init(&info, WIFI_AP, SECURITY_WPA2_AES_PSK, argv[3]);
             info.channel = 11;
 
-            result =rt_wlan_init(wlan, WIFI_AP);
+            result = rt_wlan_init(wlan, WIFI_AP);
             /* start soft ap */
             result = rt_wlan_softap(wlan, &info, argv[4]);
             if (result == RT_EOK)
             {
                 network_mode = WIFI_AP;
-            }            
+            }
         }
         else
         {
             wifi_usage();
         }
-        
+
         if (result != RT_EOK)
         {
             rt_kprintf("wifi start failed! result=%d\n", result);
@@ -529,13 +520,13 @@ int wifi(int argc, char** argv)
 
             rt_kprintf("Wi-Fi AP: %-.32s\n", wlan->info->ssid);
             rt_kprintf("MAC Addr: %02x:%02x:%02x:%02x:%02x:%02x\n", wlan->info->bssid[0],
-                    wlan->info->bssid[1],
-                    wlan->info->bssid[2],
-                    wlan->info->bssid[3],
-                    wlan->info->bssid[4],
-                    wlan->info->bssid[5]);
+                       wlan->info->bssid[1],
+                       wlan->info->bssid[2],
+                       wlan->info->bssid[3],
+                       wlan->info->bssid[4],
+                       wlan->info->bssid[5]);
             rt_kprintf(" Channel: %d\n", wlan->info->channel);
-            rt_kprintf("DataRate: %dMbps\n", wlan->info->datarate/1000);
+            rt_kprintf("DataRate: %dMbps\n", wlan->info->datarate / 1000);
             rt_kprintf("    RSSI: %d\n", rssi);
         }
         else

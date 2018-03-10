@@ -149,11 +149,11 @@ struct rt_wlan_info *rt_wlan_get_info(struct rt_wlan_device *device)
     return info;
 }
 
-int rt_wlan_scan(struct rt_wlan_device *device)
+int rt_wlan_scan(struct rt_wlan_device *device, struct rt_wlan_scan_result **scan_result)
 {
     int result;
 
-    result = rt_device_control(RT_DEVICE(device), WIFI_SCAN, RT_NULL);
+    result = rt_device_control(RT_DEVICE(device), WIFI_SCAN, scan_result);
 
     return result;
 }
@@ -199,7 +199,7 @@ int rt_wlan_enter_powersave(struct rt_wlan_device *device, int level)
 }
 
 int rt_wlan_register_event_handler(struct rt_wlan_device *device, rt_wlan_event_t event,
-                                    rt_wlan_event_handler handler)
+                                   rt_wlan_event_handler handler)
 {
     if (device == RT_NULL) return -RT_EIO;
     if (event >= WIFI_EVT_MAX) return -RT_EINVAL;
@@ -224,9 +224,9 @@ int rt_wlan_indicate_event_handle(struct rt_wlan_device *device, rt_wlan_event_t
     if (device == RT_NULL) return -RT_EIO;
     if (event >= WIFI_EVT_MAX) return -RT_EINVAL;
 
-    if(device->handler[event] != RT_NULL)
+    if (device->handler[event] != RT_NULL)
         device->handler[event](device, event, user_data);
-    
+
     return RT_EOK;
 }
 
@@ -261,4 +261,30 @@ int rt_wlan_set_channel(struct rt_wlan_device *device, int channel)
     result = rt_device_control(RT_DEVICE(device), WIFI_SET_CHANNEL, (void *)&channel);
 
     return result;
+}
+
+void rt_wlan_release_scan_result(struct rt_wlan_scan_result **scan_result)
+{
+    int i, ap_num;
+    struct rt_wlan_scan_result *_scan_result;
+
+    if (*scan_result != RT_NULL)
+    {
+        _scan_result = *scan_result;
+        ap_num = _scan_result->ap_num;
+        for (i = 0; i < ap_num; i++)
+        {
+            if (_scan_result->ap_table[i].ssid != RT_NULL)
+            {
+                rt_free(_scan_result->ap_table[i].ssid);
+                _scan_result->ap_table[i].ssid = RT_NULL;
+            }
+        }
+        _scan_result->ap_num = 0;
+        rt_free(_scan_result->ap_table);
+        _scan_result->ap_table = RT_NULL;
+    }
+    rt_free(*scan_result);
+    *scan_result = RT_NULL;
+    scan_result = RT_NULL;
 }
