@@ -81,6 +81,9 @@ static void wlan_mgnt_sta_disconnect_event(struct rt_wlan_device *device, rt_wla
     WLAN_MGNT_DBG("wlan sta disconnect event callback \n");
     netifapi_netif_set_down(device->parent.netif);
     netifapi_netif_set_link_down(device->parent.netif);
+    rt_memset(&device->parent.netif->ip_addr, 0, sizeof(ip_addr_t));
+    rt_memset(&device->parent.netif->netmask, 0, sizeof(ip_addr_t));
+    rt_memset(&device->parent.netif->gw, 0, sizeof(ip_addr_t));
 #ifdef RT_LWIP_DHCP
     dhcp_stop(device->parent.netif);
 #endif
