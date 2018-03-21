@@ -439,6 +439,7 @@ int wifi(int argc, char **argv)
     else if (strcmp(argv[2], "down") == 0)
     {
         rt_wlan_disconnect(wlan);
+        rt_wlan_info_deinit(&info);
     }
     else if (strcmp(argv[2], "scan") == 0)
     {
