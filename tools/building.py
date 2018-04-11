@@ -776,10 +776,14 @@ def SrcRemove(src, remove):
             item_str = os.path.relpath(item_str, GetCurrentDir())
 
         if type(remove) == type('str'):
+            if os.path.isabs(remove):
+                remove = os.path.relpath(remove, GetCurrentDir())
             if item_str == remove:
                 src.remove(item)
         else:
             for remove_item in remove:
+                if os.path.isabs(remove_item):
+                    remove_item = os.path.relpath(remove_item, GetCurrentDir())
                 if item_str == str(remove_item):
                     src.remove(item)
 
