@@ -33,6 +33,7 @@
 
 typedef enum
 {
+    WIFI_NONE,
     WIFI_STATION,
     WIFI_AP,
 } rt_wlan_mode_t;
