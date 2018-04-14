@@ -76,7 +76,7 @@ typedef enum
 #define WSEC_SWFLAG     0x0008
 
 #define KEY_ARRAY_SIZE  32
-
+#define SSID_LENGTH_MAX_SIZE  32 + 1
 /**
  * Enumeration of Wi-Fi security modes
  */

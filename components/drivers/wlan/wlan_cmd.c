@@ -430,6 +430,7 @@ int wifi(int argc, char **argv)
         /* TODO: use easy-join to replace */
         rt_wlan_info_init(&info, WIFI_STATION, SECURITY_WPA2_MIXED_PSK, argv[3]);
         rt_wlan_connect(wlan, &info, argv[4]);
+        rt_wlan_info_deinit(&info);
     }
     else if (strcmp(argv[2], "up") == 0)
     {

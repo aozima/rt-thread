@@ -69,6 +69,20 @@ int rt_wlan_init(struct rt_wlan_device *device, rt_wlan_mode_t mode)
 
     if (device == RT_NULL) return 0;
 
+    if (device->info == RT_NULL)
+    {
+        struct rt_wlan_info *info;
+        char *ssid;
+
+        info = rt_malloc(sizeof(struct rt_wlan_info));
+        if (info)
+        {
+            ssid = rt_malloc(SSID_LENGTH_MAX_SIZE);
+            info->ssid = ssid;
+        }
+        device->info = info;
+    }
+
     result = rt_device_control(RT_DEVICE(device), WIFI_INIT, (void *)&mode);
 
     return result;
@@ -124,15 +138,17 @@ int rt_wlan_disconnect(struct rt_wlan_device *device)
 
 int rt_wlan_set_info(struct rt_wlan_device *device, struct rt_wlan_info *info)
 {
-    if (device->info == info) return RT_EOK; /* same info */
+    if (device == RT_NULL) return -RT_EIO;
+    if (device->info == RT_NULL) return -RT_EIO;
 
-    if (device->info != RT_NULL)
-    {
-        rt_wlan_info_deinit(device->info);
-        rt_free(device->info);
-    }
-
-    device->info = info;
+    device->info->mode = info->mode;
+    device->info->security = info->security;
+    memset(device->info->ssid, 0, SSID_LENGTH_MAX_SIZE);
+    memcpy(device->info->ssid, info->ssid, strlen(info->ssid));
+    memcpy(device->info->bssid, info->bssid, 6);
+    device->info->datarate = info->datarate;
+    device->info->channel = info->channel;
+    device->info->rssi = info->rssi;
 
     return RT_EOK;
 }
