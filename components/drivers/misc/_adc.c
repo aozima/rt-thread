@@ -9,6 +9,11 @@ static rt_size_t _adc_read(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_
 	rt_size_t i;
     struct rt_device_adc *adc = (struct rt_device_adc *)dev;
 	int *value = (int *)buffer;
+	
+	if(!adc->ops->convert)
+	{
+		return 0;
+	}
 
 	for(i=0; i<size; i+=sizeof(int))
 	{
