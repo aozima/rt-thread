@@ -21,17 +21,24 @@ rt_err_t test_adc(int argc, char** argv)
 		goto _exit;
 	}
 	
-	rt_kprintf("test_adc\n");
+	result = rt_device_open(dev, RT_DEVICE_FLAG_RDONLY);
+	if(result != RT_EOK)
+	{
+		rt_kprintf("open %s faild! \n", argv[1]);
+		result = -RT_EIO;
+		goto _exit;
+	}
+	
+	rt_kprintf("test adc: %s\n", argv[1]);
 	for(channel=0; channel<9; channel++)
 	{
-		result = rt_device_read(dev, channel, &value, sizeof(value));
-		if(result != RT_EOK)
+		if( rt_device_read(dev, channel, &value, sizeof(value)) != sizeof(value) )
 		{
-			rt_kprintf("channel %d: 0x%08X \n", channel, value);
+			rt_kprintf("channel %d: faild! \n", channel);
 			result = -RT_ERROR;
 			goto _exit;
 		}
-		rt_kprintf("channel %d: 0x08X \n", channel, value);
+		rt_kprintf("channel %d: 0x%08X \n", channel, value);
 	}
 
 _exit:
