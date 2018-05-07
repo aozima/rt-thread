@@ -112,6 +112,14 @@ extern "C" {
 #include "drivers/cputime.h"
 #endif
 
+#ifdef RT_USING_ADC
+#include "drivers/drv_adc.h"
+#endif
+
+#ifdef RT_USING_PWM
+#include "drivers/drv_pwm.h"
+#endif
+
 #ifdef __cplusplus
 }
 #endif
