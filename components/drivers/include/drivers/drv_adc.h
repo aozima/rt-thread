@@ -4,7 +4,7 @@
 struct rt_adc_ops
 {
     rt_err_t (*configure)(struct rt_device *device, int channel, rt_bool_t *enable);
-    rt_uint32_t (*convert)(struct rt_device *device, int channel, int *value);
+    rt_err_t (*convert)(struct rt_device *device, int channel, int *value);
 };
 
 struct rt_device_adc
