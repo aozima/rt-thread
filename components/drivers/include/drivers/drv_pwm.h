@@ -8,6 +8,7 @@
 
 struct rt_pwm_configuration
 {
+    rt_uint32_t channel; /* 0-n */
     rt_uint32_t period; /* unit:ns 1ns~4.29s:1Ghz~0.23hz */
     rt_uint32_t pulse;  /* unit:ns (pulse<=period) */
 };
@@ -15,7 +16,7 @@ struct rt_pwm_configuration
 struct rt_device_pwm;
 struct rt_pwm_ops
 {
-    rt_err_t (*control)(struct rt_device_pwm *device, int cmd, int channel, void *arg);
+    rt_err_t (*control)(struct rt_device_pwm *device, int cmd, void *arg);
 };
 
 struct rt_device_pwm
