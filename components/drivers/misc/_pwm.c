@@ -6,7 +6,7 @@
 /*
 pos: channel
 void *buffer: rt_uint32_t pulse[size]
-size : number of pulse, only set to 1.
+size : number of pulse, only set to sizeof(rt_uint32_t).
 */
 static rt_size_t _pwm_read(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_t size)
 {
@@ -32,7 +32,7 @@ static rt_size_t _pwm_read(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_
 /*
 pos: channel
 void *buffer: rt_uint32_t pulse[size]
-size : number of pulse, only set to 1.
+size : number of pulse, only set to sizeof(rt_uint32_t).
 */
 static rt_size_t _pwm_write(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_t size)
 {
@@ -50,6 +50,13 @@ static rt_size_t _pwm_write(rt_device_t dev, rt_off_t pos, void *buffer, rt_size
         }
 
         configuration.pulse = *pulse;
+
+        result = pwm->ops->control(pwm, PWM_CMD_SET, pos, &configuration);
+        if (result != RT_EOK)
+        {
+            return 0;
+        }
+
     }
 
     return size;
