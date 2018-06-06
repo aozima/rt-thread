@@ -32,15 +32,42 @@ rt_err_t test_pwm(int argc, char** argv)
 	rt_kprintf("test pwm: %s\n", argv[1]);
 	for(channel=0; channel<9; channel++)
 	{
+		rt_uint32_t pulse1, pulse2;
+		
+		configuration.channel = channel;
 		configuration.period = 800*(channel+1);
 		configuration.pulse = configuration.period / 10 * (channel+1);
 		rt_kprintf("\ntest pwm set channel: %d, period: %d, pulse: %d\n", channel, configuration.period, configuration.pulse); 
 		
-		if( rt_device_write(dev, channel, &configuration, sizeof(struct rt_pwm_configuration)) != sizeof(struct rt_pwm_configuration) )
+		if( rt_device_control(dev, PWM_CMD_SET, &configuration) != RT_EOK )
 		{
-			rt_kprintf("test pwm set channel %d: faild! \n", channel);
+			rt_kprintf("control PWM_CMD_SET channel %d: faild! \n", channel);
 			result = -RT_ERROR;
 			goto _exit;
+		}
+		
+		pulse1 = configuration.pulse / 2;
+		if( rt_device_write(dev, channel, &pulse1, sizeof(rt_uint32_t)) != sizeof(rt_uint32_t))
+		{
+			rt_kprintf("write pwm channel %d: faild! \n", channel);
+			result = -RT_ERROR;
+			goto _exit;
+		}
+		
+		if( rt_device_read(dev, channel, &pulse2, sizeof(rt_uint32_t)) != sizeof(rt_uint32_t))
+		{
+			rt_kprintf("read pwm channel %d: faild! \n", channel);
+			result = -RT_ERROR;
+			goto _exit;
+		}
+		
+		if(pulse2 == pulse2)
+		{
+			rt_kprintf("readback pwm channel %d: OK! \n", channel);
+		}
+		else
+		{
+			rt_kprintf("readback pwm channel %d: faild! \n", channel);
 		}
 	}
 
