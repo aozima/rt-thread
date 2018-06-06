@@ -3,6 +3,21 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 
+
+static rt_err_t _pwm_control(rt_device_t dev, int cmd, void *args)
+{
+    rt_err_t result = RT_EOK;
+    struct rt_device_pwm *pwm = (struct rt_device_pwm *)dev;
+
+    if (pwm->ops->control)
+    {
+        result = pwm->ops->control(pwm, cmd, args);
+	}
+
+	return result;
+}
+
+
 /*
 pos: channel
 void *buffer: rt_uint32_t pulse[size]
@@ -13,11 +28,13 @@ static rt_size_t _pwm_read(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_
     rt_err_t result = RT_EOK;
     struct rt_device_pwm *pwm = (struct rt_device_pwm *)dev;
     rt_uint32_t *pulse = (rt_uint32_t *)buffer;
-    struct rt_pwm_configuration configuration;
+    struct rt_pwm_configuration configuration={0};
+	
+	configuration.channel = pos;
 
     if (pwm->ops->control)
     {
-        result = pwm->ops->control(pwm, PWM_CMD_GET, pos, &configuration);
+        result = pwm->ops->control(pwm, PWM_CMD_GET,  &configuration);
         if (result != RT_EOK)
         {
             return 0;
@@ -26,7 +43,7 @@ static rt_size_t _pwm_read(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_
         *pulse = configuration.pulse;
     }
 
-    return 0;
+    return size;
 }
 
 /*
@@ -34,16 +51,18 @@ pos: channel
 void *buffer: rt_uint32_t pulse[size]
 size : number of pulse, only set to sizeof(rt_uint32_t).
 */
-static rt_size_t _pwm_write(rt_device_t dev, rt_off_t pos, void *buffer, rt_size_t size)
+static rt_size_t _pwm_write(rt_device_t dev, rt_off_t pos, const void *buffer, rt_size_t size)
 {
     rt_err_t result = RT_EOK;
     struct rt_device_pwm *pwm = (struct rt_device_pwm *)dev;
     rt_uint32_t *pulse = (rt_uint32_t *)buffer;
-    struct rt_pwm_configuration configuration;
+    struct rt_pwm_configuration configuration={0};
+
+	configuration.channel = pos;
 
     if (pwm->ops->control)
     {
-        result = pwm->ops->control(pwm, PWM_CMD_GET, pos, &configuration);
+        result = pwm->ops->control(pwm, PWM_CMD_GET, &configuration);
         if (result != RT_EOK)
         {
             return 0;
@@ -51,7 +70,7 @@ static rt_size_t _pwm_write(rt_device_t dev, rt_off_t pos, void *buffer, rt_size
 
         configuration.pulse = *pulse;
 
-        result = pwm->ops->control(pwm, PWM_CMD_SET, pos, &configuration);
+        result = pwm->ops->control(pwm, PWM_CMD_SET, &configuration);
         if (result != RT_EOK)
         {
             return 0;
@@ -75,7 +94,7 @@ rt_err_t rt_device_pwm_register(struct rt_device_pwm *device, const char *name, 
     device->parent.close        = RT_NULL;
     device->parent.read         = _pwm_read;
     device->parent.write        = _pwm_write;
-    device->parent.control      = RT_NULL;
+    device->parent.control      = _pwm_control;
 
     device->ops                 = ops;
     device->parent.user_data    = (void *)user_data;
@@ -84,3 +103,37 @@ rt_err_t rt_device_pwm_register(struct rt_device_pwm *device, const char *name, 
 
     return result;
 }
+
+rt_err_t rt_pwm_enable(int channel)
+{
+    rt_err_t result = RT_EOK;
+	struct rt_device *device = rt_device_find("pwm");
+    struct rt_pwm_configuration configuration={0};
+
+	if(!device)
+	{
+		return -RT_EIO;
+	}
+	
+	configuration.channel = channel;
+    result = rt_device_control(device, PWM_CMD_ENABLE, &configuration);
+
+    return result;	
+}
+
+rt_err_t rt_pwm_set(int channel, rt_uint32_t period, rt_uint32_t pulse)
+{
+    rt_err_t result = RT_EOK;
+	struct rt_device *pwm = rt_device_find("pwm");
+	
+	if(!pwm)
+	{
+		return -RT_EIO;
+	}
+
+    return result;	
+}
+
+
+#ifdef finsh
+#endif /**/
