@@ -117,7 +117,7 @@ extern "C" {
 #endif
 
 #ifdef RT_USING_PWM
-#include "drivers/drv_pwm.h"
+#include "drivers/rt_drv_pwm.h"
 #endif
 
 #ifdef __cplusplus
