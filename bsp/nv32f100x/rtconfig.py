@@ -16,7 +16,7 @@ if  CROSS_TOOL == 'gcc':
     exit(0)
 elif CROSS_TOOL == 'keil':
     print('================ERROR============================')
-    print('Not support iar yet!')
+    print('Not support keil yet!')
     print('=================================================')
     exit(0)
 elif CROSS_TOOL == 'iar':
