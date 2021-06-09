@@ -170,12 +170,15 @@ rt_hw_context_switch_to:
     LDR     R1, =NVIC_PENDSVSET
     STR     R1, [R0]
     NOP
-    /* restore MSP */
+    /* restore MSP. (0x20000000 <= MSP <= 0x3FFFFFFF), 8-byte aligned.  */
     LDR     R0, =SCB_VTOR
     LDR     R0, [R0]
     LDR     R0, [R0]
-    NOP
-    MSR     MSP, R0
+    LDR     r1, =0x20000007
+    ANDS    r1, r1, r0
+    CBNZ    r0, restore_msp_end
+    MSR     msp, r0
+restore_msp_end:
 
     /* enable interrupts at processor level */
     CPSIE   I

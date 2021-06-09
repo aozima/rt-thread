@@ -180,11 +180,15 @@ rt_hw_context_switch_to    PROC
     LDR     r1, =NVIC_PENDSVSET
     STR     r1, [r0]
 
-    ; restore MSP
+    ; restore MSP. (0x20000000 <= MSP <= 0x3FFFFFFF), 8-byte aligned. 
     LDR     r0, =SCB_VTOR
     LDR     r0, [r0]
     LDR     r0, [r0]
+    LDR     r1, =0x20000007
+    ANDS    r1, r1, r0
+    CBNZ    r0, restore_msp_end
     MSR     msp, r0
+restore_msp_end
 
     ; enable interrupts at processor level
     CPSIE   I
